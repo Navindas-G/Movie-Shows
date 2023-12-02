@@ -11,7 +11,6 @@ struct MovieListView: View {
     
     @StateObject private var viewModel = MovieListViewModel(datasource: MovieListDataSource())
     
-    
     var body: some View {
         List {
             ForEach(viewModel.moviesListArray, id: \.id, content: { movie in
