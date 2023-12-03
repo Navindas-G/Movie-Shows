@@ -21,7 +21,7 @@ class MovieListViewModel: ObservableObject {
     }
     
     func getMovieList(for urlString: String) {
-        shouldShowLoader.toggle()
+        shouldShowLoader = true
         Task {
             do {
                 let baseModel = try await self.datasource.getMovieListData(for: urlString)
@@ -29,22 +29,20 @@ class MovieListViewModel: ObservableObject {
                     self.moviesListArray = baseModel.results ?? []
                 }
             } catch let caughtError {
-                print(caughtError.localizedDescription)
-                
+                self.shouldShowAlert = true
                 DispatchQueue.main.async {
-                    self.shouldShowNoDataFound.toggle()
-                    self.shouldShowAlert.toggle()
+                    self.shouldShowNoDataFound = true
+                    
                     if let networkError = caughtError as? NetworkError {
                         self.alertMessage = networkError.rawValue
                     } else {
                         self.alertMessage = caughtError.localizedDescription
                     }
-                    
                 }
             }
             
             DispatchQueue.main.async {
-                self.shouldShowLoader.toggle()
+                self.shouldShowLoader = false
             }
         }
     }

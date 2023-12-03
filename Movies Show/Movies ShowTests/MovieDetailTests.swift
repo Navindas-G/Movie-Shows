@@ -84,6 +84,8 @@ final class MovieDetailTests: XCTestCase {
         .store(in: &cancellable)
         
         wait(for: [loaderFlagExpectation], timeout: 15.0)
+        XCTAssertTrue(vm!.shouldShowLoader)
+        XCTAssertTrue(loaderFlag)
         XCTAssertEqual(vm!.shouldShowLoader, loaderFlag, "Both flag should be same")
     }
     
@@ -95,9 +97,13 @@ final class MovieDetailTests: XCTestCase {
         
         vm!.$shouldShowAlert.sink { flag in
             alertFlag = flag
-            alertFlagExpectation.fulfill()
+            _ = alertFlag ? alertFlagExpectation.fulfill() : Void()
         }
         .store(in: &cancellable)
+        wait(for: [alertFlagExpectation], timeout: 20)
+        XCTAssertNil(vm!.movieDetailModel)
+        XCTAssertTrue(vm!.shouldShowAlert)
+        XCTAssertTrue(alertFlag)
         XCTAssertEqual(vm!.shouldShowAlert, alertFlag, "Both flag should be same")
     }
     
@@ -109,9 +115,14 @@ final class MovieDetailTests: XCTestCase {
         var noDataFoundFlag: Bool!
         vm!.$shouldShowNoDataFound.sink { flag in
             noDataFoundFlag = flag
-            noDataFoundFlagExpectation.fulfill()
+            _ = noDataFoundFlag ? noDataFoundFlagExpectation.fulfill() : Void()
         }
         .store(in: &cancellable)
+        
+        wait(for: [noDataFoundFlagExpectation], timeout: 20)
+        XCTAssertNil(vm!.movieDetailModel)
+        XCTAssertTrue(noDataFoundFlag)
+        XCTAssertTrue(vm!.shouldShowNoDataFound)
         XCTAssertEqual(vm!.shouldShowNoDataFound, noDataFoundFlag, "Both flag should be same")
     }
 

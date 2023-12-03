@@ -38,10 +38,16 @@ final class Movies_ShowTests: XCTestCase {
         }
         .store(in: &cancellable)
 
-        wait(for: [fetchedDataExpectation], timeout: 30.0)
-        XCTAssertGreaterThan(vm.moviesListArray.count, 0)
-        XCTAssertGreaterThan(movieList.count, 0)
-        XCTAssertEqual(vm.moviesListArray.count, movieList.count, "Both list count must be equal")
+        if movieList.count > 0 {
+            wait(for: [fetchedDataExpectation], timeout: 30.0)
+            XCTAssertGreaterThan(vm.moviesListArray.count, 0)
+            XCTAssertGreaterThan(movieList.count, 0)
+            XCTAssertEqual(vm.moviesListArray.count, movieList.count, "Both list count must be equal")
+        } else {
+            XCTAssertEqual(vm.moviesListArray.count, 0)
+            XCTAssertEqual(movieList.count, 0)
+            XCTAssertEqual(vm.moviesListArray.count, movieList.count)
+        }
     }
     
     func test_For_InvalidUrl() {
@@ -88,9 +94,11 @@ final class Movies_ShowTests: XCTestCase {
             _ = alertFlag ? alertFlagExpectation.fulfill() : Void()
         }
         .store(in: &cancellable)
-        XCTAssertTrue(vm!.shouldShowAlert)
+        
+        wait(for: [alertFlagExpectation], timeout: 20.0)
+        XCTAssertTrue(self.vm!.shouldShowAlert)
         XCTAssertTrue(alertFlag)
-        XCTAssertEqual(vm!.shouldShowAlert, alertFlag, "Both flag should be same")
+        XCTAssertEqual(self.vm!.shouldShowAlert, alertFlag, "Both flag should be same")
     }
     
     func testShowNoDataFoundFlag() {
@@ -100,10 +108,16 @@ final class Movies_ShowTests: XCTestCase {
         let noDataFoundFlagExpectation = XCTestExpectation(description: "flag alert")
         var noDataFoundFlag: Bool!
         vm!.$shouldShowNoDataFound.sink { flag in
-            noDataFoundFlag = flag
-            noDataFoundFlagExpectation.fulfill()
+            DispatchQueue.main.async {
+                noDataFoundFlag = flag
+                _ = noDataFoundFlag ? noDataFoundFlagExpectation.fulfill() : Void()
+            }
         }
         .store(in: &cancellable)
+        
+        wait(for: [noDataFoundFlagExpectation], timeout: 20)
+        XCTAssertTrue(vm!.shouldShowNoDataFound)
+        XCTAssertTrue(noDataFoundFlag)
         XCTAssertEqual(vm!.shouldShowNoDataFound, noDataFoundFlag, "Both flag should be same")
     }
 

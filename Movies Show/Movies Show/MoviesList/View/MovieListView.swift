@@ -49,7 +49,7 @@ struct MovieListView: View {
         .accessibilityIdentifier("movielist")
         .alert("Error", isPresented: $viewModel.shouldShowAlert, actions: {
             Button(action: {
-                self.viewModel.shouldShowAlert.toggle()
+                self.viewModel.shouldShowAlert = false
                 self.viewModel.alertMessage = ""
             }, label: {
                 Text("OK")
@@ -64,7 +64,7 @@ struct MovieListView: View {
                 .font(.caption)
                 .fontWeight(.medium)
         })
-        .accessibilityIdentifier("movielistalert")
+        .accessibilityIdentifier("movielist")
         .listStyle(.plain)
         .onLoad {
             self.viewModel.getMovieList(for: Constant.sharedInstance.popularMovieURL)
